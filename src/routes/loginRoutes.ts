@@ -14,6 +14,19 @@ function requireAuth(req: Request, res: Response, next: NextFunction){
 }
 const router = Router();
 
+function requireLogin(req: Request, res: Response, next: NextFunction){
+  if(req.session && req.session.loggedIn){
+    next();
+    return;
+  } else {
+    res.send(`
+    <div> 
+      <div>You are not logged in</div>
+      <a href="/login">Log in</a>
+    </div>
+  `);
+  }
+}
 router.get('/login', (req: Request, res: Response) =>  {
   res.send(`
   <form method="POST">
@@ -44,23 +57,13 @@ router.post('/login', (req: RequestWithBody, res: Response) =>  {
 });
 
 
-router.get('/', (req: Request, res: Response) => {
-  if(req.session && req.session.loggedIn){
+router.get('/', requireLogin ,(req: Request, res: Response) => {
     res.send(`
       <div> 
         <div>You are logged in</div>
         <a href="/logout">Logout</a>
       </div>
     `);
-  } else {
-    res.send(`
-    <div> 
-      <div>You are not logged in</div>
-      <a href="/login">Log in</a>
-    </div>
-  `);
-
-  }
 })
 
 router.get('/logout', (req: Request, res: Response) => {

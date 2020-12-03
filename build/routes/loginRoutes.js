@@ -11,6 +11,15 @@ function requireAuth(req, res, next) {
 }
 var router = express_1.Router();
 exports.router = router;
+function requireLogin(req, res, next) {
+    if (req.session && req.session.loggedIn) {
+        next();
+        return;
+    }
+    else {
+        res.send("\n    <div> \n      <div>You are not logged in</div>\n      <a href=\"/login\">Log in</a>\n    </div>\n  ");
+    }
+}
 router.get('/login', function (req, res) {
     res.send("\n  <form method=\"POST\">\n    <div>\n      <label for=\"password\">Email</label>\n      <input name=\"email\" />\n    </div>\n    <div>\n      <label for=\"password\">Password</label>\n      <input name=\"password\" type=\"password\" />\n    </div>\n    <button>Submit</button>\n  </form>\n  ");
 });
@@ -26,13 +35,8 @@ router.post('/login', function (req, res) {
         res.send('Invalid email or password');
     }
 });
-router.get('/', function (req, res) {
-    if (req.session && req.session.loggedIn) {
-        res.send("\n      <div> \n        <div>You are logged in</div>\n        <a href=\"/logout\">Logout</a>\n      </div>\n    ");
-    }
-    else {
-        res.send("\n    <div> \n      <div>You are not logged in</div>\n      <a href=\"/login\">Log in</a>\n    </div>\n  ");
-    }
+router.get('/', requireLogin, function (req, res) {
+    res.send("\n      <div> \n        <div>You are logged in</div>\n        <a href=\"/logout\">Logout</a>\n      </div>\n    ");
 });
 router.get('/logout', function (req, res) {
     req.session = undefined;
