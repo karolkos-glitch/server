@@ -65,7 +65,7 @@ router.get('/', requireLogin ,(req: Request, res: Response) => {
       </div>
     `);
 })
-
+  
 router.get('/logout', (req: Request, res: Response) => {
     req.session = undefined;
     res.redirect('/');
