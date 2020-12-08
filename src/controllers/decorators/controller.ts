@@ -1,17 +1,22 @@
 import 'reflect-metadata';
 import { AppRouter } from '../../AppRouter';
-
-
-
+import { Methods } from './Methods';
+import { MetadataKeys} from './MetadataKeys';
 
 export function controller(routePrefix: string){
   return function(target: Function){
     const router = AppRouter.getInstance();
     for(let key in target.prototype){
       const routeHandler = target.prototype[key]; // metoda
-      const path = Reflect.getMetadata('path', target.prototype, key); // sciezka, gdzie ma RouteHandler zadzialac
+      
+      const path = Reflect.getMetadata(MetadataKeys.path, target.prototype, key); // sciezka, gdzie ma RouteHandler zadzialac
+      
+      const method : Methods = Reflect.getMetadata(MetadataKeys.method, target.prototype, key);
+      
+      const middlewares = Reflect.getMetadata(MetadataKeys.middleware, target.prototype, key) || [];
       if(path) {
-        router.get(`${routePrefix}${path}`, routeHandler)
+        // router.get(`${routePrefix}${path}`, ...middlewares, routeHandler);
+        router[method](`${routePrefix}${path}`, ...middlewares, routeHandler);
       }
     }
   }
